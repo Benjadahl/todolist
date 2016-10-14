@@ -5,6 +5,7 @@ var todoList = {
 	//Reset the form fields
 	resetForm: function() {
 		document.forms['form1'].reset();
+		todoList.GUI.populateSelect();
 	},
 
 
@@ -13,7 +14,7 @@ var todoList = {
 		localStorage.setItem('myTodoListItems', JSON.stringify(this.items));
 		localStorage.setItem('myTodoListCategories', JSON.stringify(this.categories));
 	},
-	
+
 	// Get data from local storage
 	getData: function() {
 		this.items = JSON.parse(localStorage.getItem('myTodoListItems'));
@@ -101,6 +102,15 @@ var todoList = {
 		this.resetForm();
 	},
 
+	newCategory: function(name){
+		if (this.categories.indexOf(name) == -1) { //Create category if it doesn't exist
+			this.categories.push(name);
+			// Store data in local storage
+			this.storeData();
+			this.resetForm();
+		}
+	},
+
 	showList: function() {
 		document.getElementById("display").innerHTML = "";
 		for (i in this.items) {
@@ -114,7 +124,7 @@ var todoList = {
 		for (i in this.categories) { //Go through categories
 			//Print category heading-style
 			console.log('===== ' + this.categories[i].toUpperCase() + ' =====');
-			document.getElementById("display").innerHTML += ('===== ' + this.categories[i].toUpperCase() + ' =====' + '<br>'); 
+			document.getElementById("display").innerHTML += ('===== ' + this.categories[i].toUpperCase() + ' =====' + '<br>');
 			for (j in this.items) { //Search items for matching category
 				if (this.items[j].categories.indexOf(this.categories[i]) != -1) {
 					console.log('- ' + this.items[j].val);
@@ -127,8 +137,35 @@ var todoList = {
 	//Clears the Display Section
 	clear: function() {
 		document.getElementById("display").innerHTML = "";
+	},
+
+	//GUI code
+	GUI: {
+		//Function for repopulating the options of the dropdown menu for categories
+		populateSelect: function(){
+			//Define the select element
+			var select = document.getElementById("catSelect");
+
+			//Delete all current children of the element(old options)
+			while(select.firstChild){
+				select.removeChild(select.firstChild);
+			}
+
+			//A loop for creating elements for the current categories
+			for(element in todoList.categories){
+				//Define new option
+				var opt = document.createElement("option");
+				//Set the usertext and value of the option to the name of the category
+				opt.value = todoList.categories[element];
+				opt.innerHTML = todoList.categories[element];
+
+				//Apend the element to the select element
+				select.appendChild(opt);
+			}
+		}
 	}
 };
 
 // Initialise todoList data with local storage data
 todoList.getData();
+todoList.GUI.populateSelect();
